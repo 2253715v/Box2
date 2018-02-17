@@ -77,36 +77,58 @@ app.listen(port, function () {
 
 app.get("/", function (req, res) {
 
-    if(req.authenticated){
-        con.query("SELECT * FROM Account INNER JOIN Holdings ON Account.user_id=Holdings.user_id WHERE Account.user_id='"+req.email+"' ;", function(err, result, fields){
+    if (req.authenticated) {
+        con.query("SELECT * FROM Account INNER JOIN Holdings ON Account.user_id=Holdings.user_id WHERE Account.user_id='" + req.email + "' ;", function (err, result, fields) {
             if (err) throw err;
             balance = 0;
             num_shares = 0;
-            
+
             if (result.length === 1) {
                 num_shares = result[0].num_shares;
                 balance = result[0].balance;
             }
 
-            res.render('exchange/index', {"name":req.name, "authenticated":req.authenticated, "balance":balance, "num_shares":num_shares})
+            res.render('exchange/index', { "name": req.name, "authenticated": req.authenticated, "balance": balance, "num_shares": num_shares })
         });
 
-    }else{
-        res.render('exchange/index', {"name":req.name, "authenticated":req.authenticated})
+    } else {
+        res.render('exchange/index', { "name": req.name, "authenticated": req.authenticated })
     }
 });
 
-app.get("/auth/login/", function(req, res){
+app.get("/auth/login/", function (req, res) {
     errors = []
-    if(req.authenticated){
+    if (req.authenticated) {
         res.redirect("/")
         return
     }
     res.render('registration/user_login');
 });
 
-app.post("/auth/login/", function(req, res){
-    if(req.authenticated){
+app.get("/auth/userProfile/", function (req, res) {
+    errors = []
+    data = []
+    if (req.authenticated) {
+        if (req.cookie.email) {
+            res.data.push(req.cookie.email)
+            con.query("SELECT name FROM Users WHERE email='" + req.cookie.email + "');", function (err, result, fields) {
+                if (err) throw err;
+                console.log(result);
+                if (result.length === 1) {
+                    res.data.push(result[0][0]);
+                    res.render('registration/user_login');
+                } else {
+                    errors.push("Internal Error! Please login again")
+                }
+            });
+            return
+        }
+    }
+    res.render('registration/user_login');
+});
+
+app.post("/auth/login/", function (req, res) {
+    if (req.authenticated) {
         res.redirect("/")
         return
     }
@@ -115,14 +137,14 @@ app.post("/auth/login/", function(req, res){
     email = req.body.email
     password = req.body.password
 
-    if(email == undefined){
+    if (email == undefined) {
 
         errors.push("Please enter a valid email!")
         res.render('registration/user_login')
         return
     }
-    
-    if(password == undefined){
+
+    if (password == undefined) {
         errors.push("Please enter a valid password!")
         res.render('registration/user_login')
         return
@@ -143,28 +165,28 @@ app.post("/auth/login/", function(req, res){
 
 });
 
-app.get("/auth/register/", function(req, res){
+app.get("/auth/register/", function (req, res) {
     errors = []
-    if(req.authenticated){
+    if (req.authenticated) {
         res.redirect("/")
         return
     }
     res.render('registration/user_register');
 });
 
-app.post("/auth/register/", function(req, res){
+app.post("/auth/register/", function (req, res) {
     errors = []
-    
+
     full_name = req.body.name
     email = req.body.email
     password = req.body.password
     password_confirm = req.body.password_confirm
 
-    if(full_name !== undefined && full_name !== ""){
-        if(email !== undefined && email !== ""){
-            if(password !== undefined && password !==""){
-                if(password_confirm !== undefined){
-                    if(password == password_confirm){
+    if (full_name !== undefined && full_name !== "") {
+        if (email !== undefined && email !== "") {
+            if (password !== undefined && password !== "") {
+                if (password_confirm !== undefined) {
+                    if (password == password_confirm) {
                         prepared_statement = `REPLACE INTO Users (name, email, password) VALUES ("${full_name}","${email}", "${password}");`
                         con.query(prepared_statement);
 
@@ -189,37 +211,37 @@ app.post("/auth/register/", function(req, res){
         errors.push("Please provide your full name");
     }
 
-    if(errors.length==0){
+    if (errors.length == 0) {
         res.redirect('/auth/login/');
-    }else{
+    } else {
         res.render('registration/user_register');
     }
 });
 
-app.get("/auth/logout/", function(req, res){
+app.get("/auth/logout/", function (req, res) {
     res.clearCookie("email");
     res.clearCookie("password");
     res.redirect('/');
 });
 
-app.get("/maintenance", function(req, res) {
-   if (req.authenticated) {
-       process.exit();
-   }
+app.get("/maintenance", function (req, res) {
+    if (req.authenticated) {
+        process.exit();
+    }
 });
 
-app.get("/stockprices/", function(req, res){
+app.get("/stockprices/", function (req, res) {
     timedelta = req.query.timedelta || 24
     then = new Date()
-    then.setHours(new Date().getHours()-timedelta)
+    then.setHours(new Date().getHours() - timedelta)
     then = then.toISOString().slice(0, 19).replace('T', ' ')
 
-    con.query("SELECT unix_timestamp(datetime) * 1000 as datetime, traded_at FROM StockHistory WHERE (symbol='NAT') AND (datetime >= '"+then+"');", function(err, result, fields){
+    con.query("SELECT unix_timestamp(datetime) * 1000 as datetime, traded_at FROM StockHistory WHERE (symbol='NAT') AND (datetime >= '" + then + "');", function (err, result, fields) {
         data = {}
         data["labels"] = []
         data["data"] = []
 
-        for(entry in result){
+        for (entry in result) {
             data["labels"].push(result[entry]["datetime"])
             data["data"].push(result[entry]["traded_at"])
         }
@@ -229,18 +251,18 @@ app.get("/stockprices/", function(req, res){
 });
 
 //Make a trade
-app.get("/trade", function(req, res){
+app.get("/trade", function (req, res) {
     errors = []
-    
-    if(req.cookies.email !== undefined && req.query.trade !== undefined && req.query.amount !== undefined && req.query.amount%1==0 && req.query.amount >= 1){
+
+    if (req.cookies.email !== undefined && req.query.trade !== undefined && req.query.amount !== undefined && req.query.amount % 1 == 0 && req.query.amount >= 1) {
         email = req.cookies.email
         trade_type = req.query.trade
         amount = parseInt(req.query.amount)
 
-        con.query("SELECT * FROM Account INNER JOIN Holdings ON Account.user_id=Holdings.user_id WHERE Account.user_id='"+email+"' ;", function(err, result, fields){
-            if (err){
+        con.query("SELECT * FROM Account INNER JOIN Holdings ON Account.user_id=Holdings.user_id WHERE Account.user_id='" + email + "' ;", function (err, result, fields) {
+            if (err) {
                 errors.push("Authentication error!")
-                res.send({errors:errors})
+                res.send({ errors: errors })
                 return
             }
 
@@ -248,51 +270,51 @@ app.get("/trade", function(req, res){
                 num_shares = result[0].num_shares;
                 balance = result[0].balance;
 
-                con.query("SELECT * FROM Stocks WHERE symbol='NAT';", function(err, result, fields){
-                    if(err){
+                con.query("SELECT * FROM Stocks WHERE symbol='NAT';", function (err, result, fields) {
+                    if (err) {
                         errors.push("Encountered an error")
-                        res.send({errors:errors})
+                        res.send({ errors: errors })
                         return
                     }
 
-                    if(result.length ===1){
+                    if (result.length === 1) {
                         price = result[0].last_price
 
-                        if(trade_type=="B"){
-                            new_balance = balance - amount*price
+                        if (trade_type == "B") {
+                            new_balance = balance - amount * price
                             new_shares = num_shares + amount
 
-                            if(new_balance < 0){
+                            if (new_balance < 0) {
                                 errors.push("Too few funds!")
-                                res.send({errors:errors})
+                                res.send({ errors: errors })
                                 return
                             }
-                        }else if(trade_type=="S"){
-                            new_balance = balance + amount*price
+                        } else if (trade_type == "S") {
+                            new_balance = balance + amount * price
                             new_shares = num_shares - amount
 
-                            if(new_shares < 0){
+                            if (new_shares < 0) {
                                 errors.push("Trying to sell too much stock!")
-                                res.send({errors:errors})
+                                res.send({ errors: errors })
                                 return
                             }
-                        }else{
+                        } else {
                             errors.push("Invalid Transaction")
-                            res.send({errors:errors})
+                            res.send({ errors: errors })
                             return
                         }
 
-                        con.query("UPDATE Account SET balance='"+new_balance+"' WHERE user_id='"+email+"';");
-                        con.query("UPDATE Holdings SET num_shares='"+new_shares+"' WHERE user_id='"+email+"';");
+                        con.query("UPDATE Account SET balance='" + new_balance + "' WHERE user_id='" + email + "';");
+                        con.query("UPDATE Holdings SET num_shares='" + new_shares + "' WHERE user_id='" + email + "';");
                         con.query(`INSERT INTO Trades (user_id, symbol, transaction, num_shares, price) VALUES ("${email}","NAT","${trade_type}","${amount}","${price}");`);
 
-                        res.send({balance:new_balance, shares:new_shares});
+                        res.send({ balance: new_balance, shares: new_shares });
                     }
                 });
             }
         });
     } else {
         errors.push("Invalid Amount!")
-        res.send({errors:errors})
+        res.send({ errors: errors })
     }
 });
