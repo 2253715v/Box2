@@ -116,7 +116,7 @@ app.get("/auth/userProfile/", function (req, res) {
                 console.log(result);
                 if (result.length === 1) {
                     res.data.push(result[0][0]);
-                    res.render('registration/user_login');
+                    res.render('userProfile');
                 } else {
                     errors.push("Internal Error! Please login again")
                 }
