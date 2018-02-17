@@ -1,0 +1,53 @@
+extends ../base
+
+block content
+    .row
+        if authenticated
+            .col-md-4
+                .row
+                    .col-md-12
+                        .panel-default
+                            .panel-heading
+                                i.fa.fa-user 
+                                |   Logged in as !{name}
+                            .panel-body
+                                p(id="balance_p") Account Balance: !{balance}
+                                p(id="holdings_p") NAT Holdings: !{num_shares}
+                br
+                .row
+                    .col-md-12
+                        .panel-default
+                            .panel-heading
+                                |   Financial Instruments
+                            
+                            table(class="table table-hover")
+                                tbody
+                                    tr
+                                        td NAT
+
+        unless authenticated 
+            .col-md-12
+                include stock_graph
+        else 
+            .col-md-8
+                include stock_graph
+
+    br
+    if authenticated
+        .row
+            include ../errors
+        .row
+            .col-md-6
+                .col-md-12
+                    .panel-default
+                        .panel-heading
+                            p Buy NAT Stock
+                        .panel-body
+                            include buy_form
+            .col-md-6
+                .col-md-12
+                    .panel-default
+                        .panel-heading
+                            p Sell NAT Stock
+                        .panel-body
+                            include sell_form

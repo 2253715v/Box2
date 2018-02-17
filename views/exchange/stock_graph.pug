@@ -1,0 +1,16 @@
+.col-md-12
+    .panel-default
+        .panel-heading
+            | NAT Stock
+        .panel-body
+            .stocks-container#stockChartContainer
+                canvas#stockChart
+            .row
+                .col-md-3
+                    input(type="button" id="stock_hour" class="btn btn-primary" value="Hour")
+                .col-md-3
+                    input(type="button" id="stock_day" class="btn btn-primary" value="Day")
+                .col-md-3
+                    input(type="button" id="stock_week" class="btn btn-primary" value="Week")
+                .col-md-3
+                    input(type="button" id="stock_month" class="btn btn-primary" value="Month")

@@ -1,0 +1,9 @@
+extends ../form.pug
+
+block formfields
+    div(class="form-group")
+        input(class="form-control" id="id_buy_amount" maxlength="150" name="amount" placeholder="Buy Amount")
+        input(type="hidden" name="trade" value="B")
+
+block submitbutton
+    input(type="button" onclick="buyStock()" class="btn btn-primary" value="Buy NAT")

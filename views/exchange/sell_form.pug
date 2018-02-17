@@ -1,0 +1,10 @@
+extends ../form.pug
+
+block formfields
+    div(class="form-group")
+        input(class="form-control" id="id_sell_amount" maxlength="150" name="amount" placeholder="Sell Amount")
+        input(type="hidden" name="trade" value="S")
+
+block submitbutton
+    input(type="button" onclick="sellStock()" class="btn btn-primary" value="Sell NAT")
+

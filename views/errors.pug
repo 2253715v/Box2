@@ -1,0 +1,5 @@
+if errors
+    ul
+        each error in errors 
+            div(class="alert alert-danger alert-dismissable clickable" data-dismiss="alert")
+                li(style="list-style: none;")=error

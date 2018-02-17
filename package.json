@@ -1,0 +1,19 @@
+{
+  "name": "stock-market",
+  "version": "1.0.0",
+  "description": "A stock market for fun and profit",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "latest",
+    "express": "^4.0.0",
+    "mysql": "latest",
+    "pug": "^2.0.0-rc.4",
+    "socket.io": "^2.0.4"
+  }
+}

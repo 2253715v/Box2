@@ -1,0 +1,13 @@
+extends ../slim
+block slim_content
+    .content
+        .row
+            .login-panel.panel.panel-default
+                .panel-heading
+                    h3.panel-title Log in
+                .panel-body
+                    include ../errors
+                    include user_login_form
+        .row
+            p Don't have an account yet?
+                a(href="/auth/register/") Register

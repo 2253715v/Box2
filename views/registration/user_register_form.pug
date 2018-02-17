@@ -1,0 +1,19 @@
+extends ../form.pug
+
+block formfields
+    .form-group
+        input(class="form-control tooltip-input" data-placement="top" data-toggle="tooltip" id="id_name" maxlength="150" 
+            name="name" placeholder="Full Name" title="" data-original-title="Your full, legal name." type="text") 
+    
+    .form-group
+        input(class="form-control" id="id_email" maxlength="150" name="email" placeholder="Email" type="email")
+
+    .form-group
+        input(class="form-control" id="id_password" maxlength="150" name="password" placeholder="Password" type="password") 
+
+    .form-group
+        input(class="form-control" id="id_password_confirm" maxlength="150" name="password_confirm" placeholder="Confirm Password" type="password")
+                
+block submitbutton
+    input(type="submit" class="btn btn-primary" value="Register")
+

@@ -1,0 +1,15 @@
+extends ../slim
+block slim_content
+    .container
+        .row
+            .login-panel.panel.panel-default
+                .panel-heading
+                    h3.panel-title Register
+                .panel-body
+                    include ../errors
+                    include user_register_form
+        .row
+            p Already have an account?
+                a(href="/auth/login/") Login
+
+    script(src="js/tooltip-input.js")
